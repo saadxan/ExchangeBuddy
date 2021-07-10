@@ -142,9 +142,8 @@ class QueryResults(QTableWidget):
 
     def __init__(self, sector='', country='', marketcap=''):
         super(QueryResults, self).__init__()
-        self.setStyleSheet('''QueryResults{background-color: rgba(0,0,0,0);}
+        self.setStyleSheet('''QueryResults{background-color: rgba(0,0,0,0); selection-background-color: khaki;}
                             QueryResults QTableCornerButton::section{background-color: rgba(0,0,0,0);}''')
-        self.setStyleSheet("QueryResults{selection-background-color: khaki;}")
         self.horizontalHeader().setStyleSheet("background-color: rgba(0,0,0,0);")
         self.verticalHeader().setStyleSheet("background-color: rgba(0,0,0,0);")
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)

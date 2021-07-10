@@ -3,6 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 import random
+
 import inquiry_artifacts as inquiry_gui
 
 

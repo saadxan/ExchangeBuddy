@@ -1,3 +1,4 @@
+from PyQt5 import QtGui
 from PyQt5.QtChart import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -53,6 +54,59 @@ class StockChartView(QChartView):
 
     def __init__(self, chart):
         super(StockChartView, self).__init__(chart)
+        self.setRubberBand(QChartView.HorizontalRubberBand)
+
+    def validate_move(self):
+        min_val = self.chart().axisX().min()
+        true_min = self.chart().initial_range[0]
+        if type(min_val) is str:
+            true_min = QDateTime.toString(true_min, "MM/dd/yyyy")
+            if QDateTime.fromString(min_val, "MM/dd/yyyy") < QDateTime.fromString(true_min, "MM/dd/yyyy"):
+                self.chart().axisX().setMin(true_min)
+                return False
+        else:
+            if min_val < true_min:
+                self.chart().axisX().setMin(true_min)
+                return False
+
+        max_val = self.chart().axisX().max()
+        true_max = self.chart().initial_range[1]
+        if type(max_val) is str:
+            true_max = QDateTime.toString(true_max, "MM/dd/yyyy")
+            if QDateTime.fromString(max_val, "MM/dd/yyyy") > QDateTime.fromString(true_max, "MM/dd/yyyy"):
+                self.chart().axisX().setMax(true_max)
+                return False
+        else:
+            if max_val > true_max:
+                self.chart().axisX().setMax(true_max)
+                return False
+
+        return True
+
+    def wheelEvent(self, a0: QtGui.QWheelEvent) -> None:
+        if a0.angleDelta().y() > 0:
+            if self.validate_move() is True:
+                self.zoom_action(1.01, a0.pos().x() - self.chart().plotArea().x())
+
+        elif a0.angleDelta().y() < 0 and type(self.chart().axisX().min()) is not str:
+            if self.validate_move() is True:
+                self.zoom_action(0.99, a0.pos().x() - self.chart().plotArea().x())
+
+    def zoom_action(self, matrix, midpoint):
+        plot_area = self.chart().plotArea()
+
+        width = plot_area.width()
+        plot_area.setWidth(float(width / matrix))
+        mid_matrix = float(midpoint / width)
+
+        left_move_factor = midpoint - (plot_area.width() * mid_matrix)
+        plot_area.moveLeft(plot_area.x() + left_move_factor)
+        self.chart().zoomIn(plot_area)
+
+    def mousePressEvent(self, event):
+        if event.button() == 2:
+            self.chart().zoomReset()
+            self.validate_move()
 
 
 class StockChart(QChart):
@@ -64,6 +118,8 @@ class StockChart(QChart):
         self.period = period
         self.axis = axis
         self.candle_status = False
+        self.initial_range = None
+        self.entry_amount = 0
         self.create_chart(period)
         self.legend().hide()
         self.setTheme(QChart.ChartThemeBlueCerulean)
@@ -80,12 +136,14 @@ class StockChart(QChart):
         for date, price in zip(dates, prices):
             series.append((date.timestamp() + 86400) * 1000, price)
 
+        self.entry_amount = len(series)
+
         x_date_axis = QDateTimeAxis()
         x_date_axis.setFormat("MM/dd/yyyy")
         x_date_axis.setLabelsAngle(-45)
-        series_size = len(series)
-        if series_size < 16:
-            x_date_axis.setTickCount(series_size)
+
+        if len(series) < 16:
+            x_date_axis.setTickCount(len(series))
         else:
             x_date_axis.setTickCount(16)
 
@@ -100,8 +158,14 @@ class StockChart(QChart):
         self.setAxisX(x_date_axis, series)
         self.setAxisY(y_value_axis, series)
 
+        self.initial_range = (self.axisX().min(), self.axisX().max())
+
+        if period == 'max':
+            self.candle_status = False
+
         if self.candle_status:
             self.toggle_candle_series(True)
+
 
     def update_chart(self, period, axis):
         self.period = period
@@ -131,6 +195,8 @@ class StockChart(QChart):
                 date = QDateTime.fromSecsSinceEpoch((entries.index[i].timestamp() + 86400)).toString("MM/dd/yyyy")
                 dates.append(date)
 
+            self.entry_amount = len(dates)
+
             x_bar_axis = QBarCategoryAxis()
             x_bar_axis.setCategories(dates)
             x_bar_axis.setGridLineVisible(False)
@@ -147,23 +213,10 @@ class StockChart(QChart):
             self.setAxisY(y_value_axis, series)
             self.removeAxis(self.axisY())
             self.removeAxis(self.axisX())
+
         else:
             self.candle_status = status
             self.update_chart(self.period, self.axis)
-
-    def mousePressEvent(self, event: 'QGraphicsSceneMouseEvent') -> None:
-        button_clicked = event.button()
-        tick_count = 0
-
-        if isinstance(self.axisX(), QDateTimeAxis):
-            tick_count = self.axisX().tickCount()
-        elif isinstance(self.axisX(), QBarCategoryAxis):
-            tick_count = self.axisX().count()
-
-        if button_clicked == 1:
-            self.zoom(1 + tick_count / 100.0)
-        elif button_clicked == 2:
-            self.zoomReset()
 
 
 class CandleStickDay(QCandlestickSeries):
@@ -310,12 +363,15 @@ class CandlestickToggle(QPushButton):
     def toggle_candles(self):
         stock_chart = get_this('chart')
 
-        if self.isChecked():
-            stock_chart.toggle_candle_series(True)
-            self.setText("Hide Candlesticks")
-        else:
+        if stock_chart.period == 'max':
+            self.setChecked(False)
+
+        if not self.isChecked():
             stock_chart.toggle_candle_series(False)
             self.setText("Show Candlesticks")
+        elif self.isChecked():
+            stock_chart.toggle_candle_series(True)
+            self.setText("Hide Candlesticks")
 
 
 def get_this(item='chart' or 'info'):

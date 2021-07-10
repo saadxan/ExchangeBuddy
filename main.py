@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import *
 
 from explore_artifacts import *
 from hub_artifacts import *
+from preferences_artifacts import *
 
 
 class StackDriver(QStackedWidget):
@@ -24,6 +25,7 @@ class MainTab(QTabWidget):
         self.create_hub_tab()
         self.explore_form = QFormLayout()
         self.create_explore_tab()
+        self.preferences_form = QFormLayout()
         self.create_preferences_tab()
 
     def create_hub_tab(self):
@@ -42,7 +44,7 @@ class MainTab(QTabWidget):
         self.h3_box.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.h3_box.setSpacing(20)
         self.h3_box.addWidget(StockList(['^DJI', '^GSPC', '^IXIC', '^RUT']))
-        self.h3_box.addWidget(StockList(['MSFT', 'AAPL', 'IBM', 'AMZN', 'INTC', 'AMD', 'CRM', 'CSCO', 'ADBE', 'PLTR']))
+        self.h3_box.addWidget(StockList(['IBM', 'AMZN', 'INTC', 'AMD', 'CRM', 'CSCO', 'ADBE', 'PLTR']))
         self.h3_box.addWidget(StockList(config.fav))
 
         self.hub_box.addLayout(self.h_box)
@@ -50,7 +52,6 @@ class MainTab(QTabWidget):
         self.hub_box.addLayout(self.h3_box)
 
         self.hub_tab.setLayout(self.hub_box)
-
         self.addTab(self.hub_tab, "Hub")
 
     def create_explore_tab(self):
@@ -75,11 +76,13 @@ class MainTab(QTabWidget):
         self.explore_form.addWidget(ExploreButton())
 
         self.explore_tab.setLayout(self.explore_form)
-
         self.addTab(self.explore_tab, "Explore")
 
     def create_preferences_tab(self):
-        self.addTab(QWidget(), "Preferences")
+        self.preferences_form.addWidget(ResetButton())
+
+        self.preferences_tab.setLayout(self.preferences_form)
+        self.addTab(self.preferences_tab, "Preferences")
 
 
 if __name__ == "__main__":

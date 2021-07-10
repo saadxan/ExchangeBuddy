@@ -28,13 +28,15 @@ def go_explore(sector, country, marketcap):
 
 def return_home():
     cur_index = config.stk.indexOf(config.stk.currentWidget())
-
     config.stk.removeWidget(config.stk.widget(cur_index))
-    config.stk.widget(0).centralWidget().h_box.itemAt(1).widget().click()
+    refresh_home()
     config.stk.setCurrentIndex(cur_index-1)
+
+
+def refresh_home():
+    config.stk.widget(0).centralWidget().h_box.itemAt(1).widget().click()
 
 
 def suspend_query():
     config.stk.removeWidget(config.stk.widget(1))
     config.stk.setCurrentIndex(0)
-
