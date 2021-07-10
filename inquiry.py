@@ -27,7 +27,7 @@ class InquiryCard(QWidget):
         h_box.addWidget(inquiry_gui.FavoriteButton(self.ticker))
 
         v_box.addLayout(h_box)
-        v_box.addWidget(inquiry_gui.QChartView(self.chart))
+        v_box.addWidget(inquiry_gui.StockChartView(self.chart))
 
         h2_box = QHBoxLayout()
         h2_box.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)

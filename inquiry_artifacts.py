@@ -1,3 +1,6 @@
+import math
+
+from PyQt5 import QtCore
 from PyQt5.QtChart import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -49,6 +52,12 @@ class FavoriteButton(QPushButton):
                 self.setText("Unfavorite")
 
 
+class StockChartView(QChartView):
+
+    def __init__(self, chart):
+        super(StockChartView, self).__init__(chart)
+
+
 class StockChart(QChart):
 
     def __init__(self, ticker, period='7d', axis='Close'):
@@ -75,6 +84,12 @@ class StockChart(QChart):
 
         x_date_axis = QDateTimeAxis()
         x_date_axis.setFormat("MM/dd/yyyy")
+        x_date_axis.setLabelsAngle(-45)
+        series_size = len(series)
+        if series_size < 16:
+            x_date_axis.setTickCount(series_size)
+        else:
+            x_date_axis.setTickCount(16)
 
         y_value_axis = QValueAxis()
         if self.axis != 'Volume':
@@ -138,6 +153,15 @@ class StockChart(QChart):
             self.candle_status = status
             self.update_chart(self.period, self.axis)
 
+    def mousePressEvent(self, event: 'QGraphicsSceneMouseEvent') -> None:
+        button_clicked = event.button()
+        tick_count = self.axisX().tickCount()
+
+        if button_clicked == 1:
+            self.zoom(1.05)
+        elif button_clicked == 2:
+            self.zoomReset()
+
 
 class CandleStickDay(QCandlestickSeries):
 
@@ -145,7 +169,7 @@ class CandleStickDay(QCandlestickSeries):
         super(CandleStickDay, self).__init__()
         self.setIncreasingColor(QColor(0, 200, 0))
         self.setDecreasingColor(QColor(200, 0, 0))
-        self.parent_chart = config.stk.widget(1).chart
+        self.parent_chart = get_this('chart')
         self.hovered.connect(self.action)
 
     def action(self, hovered, cs):
