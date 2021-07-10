@@ -43,10 +43,10 @@ class StockListLabel(QLabel):
 
 class StockList(QListWidget):
 
-    def __init__(self, list):
+    def __init__(self, stock_list):
         super(StockList, self).__init__()
         self.setMaximumSize(175, 510)
-        self.fill_stock_list(list)
+        self.fill_stock_list(stock_list)
         self.itemClicked.connect(self.action)
 
     def fill_stock_list(self, list):

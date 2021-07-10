@@ -20,7 +20,7 @@ class ExploreBar(QLineEdit):
         self.setText(self.text().upper())
 
     def execute_explore(self):
-        nav.go_inquiry(self.text())
+        nav.go_inquiry(self.text(), 1)
         self.clear()
 
 
@@ -143,6 +143,7 @@ class QueryResults(QTableWidget):
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.results = []
         self.query(sector, country, marketcap)
+        self.validate_results()
         self.make_query_table()
         self.itemClicked.connect(self.selected_inquiry)
 
@@ -150,6 +151,16 @@ class QueryResults(QTableWidget):
         for ds in EXPLORE_DATA_SET.data:
             if sector in (ds['Sector'], '') and country in (ds['Country'], '') and marketcap <= float(ds['Market Cap']):
                 self.results.append(ds)
+
+    def validate_results(self):
+        if len(self.results) == 0:
+            empty_query_message = QErrorMessage()
+            empty_query_message.setFixedSize(475, 175)
+            message = "No stocks found on NASDAQ w/ the selected parameters.<br><br>"
+            message += "PS: Over 80% of NASDAQ tickers are American!"
+            empty_query_message.showMessage(message)
+            empty_query_message.exec_()
+            return
 
     def make_query_table(self):
         if len(self.results) == 0:

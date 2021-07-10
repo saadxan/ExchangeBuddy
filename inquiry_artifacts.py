@@ -77,7 +77,10 @@ class StockChart(QChart):
         x_date_axis.setFormat("MM/dd/yyyy")
 
         y_value_axis = QValueAxis()
-        y_value_axis.setLabelFormat("$%.2f")
+        if self.axis != 'Volume':
+            y_value_axis.setLabelFormat("$%.2f")
+        else:
+            y_value_axis.setLabelFormat("%.0f")
 
         self.addSeries(series)
 
@@ -112,7 +115,8 @@ class StockChart(QChart):
                 candle_set.setClose(entries['Close'][i])
                 candle_set.setTimestamp((entries.index[i].timestamp()))
                 series.append(candle_set)
-                date = QDateTime.fromMSecsSinceEpoch(((entries.index[i].timestamp() + 86400) * 1000)).toString("MM/dd/yyyy")
+                date = QDateTime.fromMSecsSinceEpoch(((entries.index[i].timestamp() + 86400) * 1000)).toString(
+                    "MM/dd/yyyy")
                 dates.append(date)
 
             self.addSeries(series)
@@ -121,7 +125,10 @@ class StockChart(QChart):
             x_bar_axis.setCategories(dates)
 
             y_value_axis = QValueAxis(series)
-            y_value_axis.setLabelFormat("$%.2f")
+            if self.axis != 'Volume':
+                y_value_axis.setLabelFormat("$%.2f")
+            else:
+                y_value_axis.setLabelFormat("%.0f")
 
             self.setAxisX(x_bar_axis, series)
             self.setAxisY(y_value_axis, series)
@@ -215,8 +222,8 @@ class PeriodSlider(QSlider):
         self.valueChanged.connect(self.change_period)
 
     def change_period(self):
-        stock_chart = config.stk.widget(1).chart
-        info_piece = config.stk.widget(1).info
+        stock_chart = get_this('chart')
+        info_piece = get_this('info')
 
         cur_value = self.value()
         period = ''
@@ -245,7 +252,7 @@ class AxisDial(QDial):
         self.valueChanged.connect(self.change_axis)
 
     def change_axis(self):
-        stock_chart = config.stk.widget(1).chart
+        stock_chart = get_this('chart')
 
         cur_value = self.value()
         axis = ''
@@ -269,7 +276,7 @@ class CandlestickToggle(QPushButton):
         self.clicked.connect(self.toggle_candles)
 
     def toggle_candles(self):
-        stock_chart = config.stk.widget(1).chart
+        stock_chart = get_this('chart')
 
         if self.isChecked():
             stock_chart.toggle_candle_series(True)
@@ -277,3 +284,10 @@ class CandlestickToggle(QPushButton):
         else:
             stock_chart.toggle_candle_series(False)
             self.setText("Show Candlesticks")
+
+
+def get_this(item='chart' or 'info'):
+    if hasattr(config.stk.widget(1), item):
+        return getattr(config.stk.widget(1), item)
+    else:
+        return getattr(config.stk.widget(2), item)

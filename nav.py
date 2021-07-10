@@ -19,8 +19,11 @@ def go_inquiry(ticker, i):
 
 
 def go_explore(sector, country, marketcap):
-    config.stk.insertWidget(1, ExploreQuery(sector, country, marketcap))
+    explore_query = ExploreQuery(sector, country, marketcap)
+    config.stk.insertWidget(1, explore_query)
     config.stk.setCurrentIndex(1)
+    if len(config.stk.widget(1).layout().itemAt(1).widget().results) == 0:
+        suspend_query()
 
 
 def return_home():
@@ -29,4 +32,9 @@ def return_home():
     config.stk.removeWidget(config.stk.widget(cur_index))
     config.stk.widget(0).centralWidget().h_box.itemAt(1).widget().click()
     config.stk.setCurrentIndex(cur_index-1)
+
+
+def suspend_query():
+    config.stk.removeWidget(config.stk.widget(1))
+    config.stk.setCurrentIndex(0)
 
