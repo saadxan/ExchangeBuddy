@@ -1,0 +1,2 @@
+stk = None
+fav = ['TSLA']
