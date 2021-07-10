@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 import config
+import nav
 import yfinance as yf
 
 
@@ -11,12 +12,10 @@ class ReturnButton(QPushButton):
 
     def __init__(self):
         super(ReturnButton, self).__init__("Return")
-        self.clicked.connect(self.return_action)
+        self.clicked.connect(self.return_home)
 
-    def return_action(self):
-        config.stk.removeWidget(config.stk.widget(1))
-        config.stk.widget(0).centralWidget().h_box.itemAt(1).widget().click()
-        config.stk.setCurrentIndex(0)
+    def return_home(self):
+        nav.return_home()
 
 
 class TickerHeader(QLabel):
@@ -156,6 +155,7 @@ class InfoPiece(QTableWidget):
 
     def __init__(self, ticker, period='7d'):
         super(InfoPiece, self).__init__()
+        self.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ticker = yf.Ticker(ticker)
         self.period = period
         self.info_table = []

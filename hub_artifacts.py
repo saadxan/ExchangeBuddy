@@ -1,9 +1,9 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from inquiry import *
 
 import config
+import nav
 
 
 class ExitButton(QPushButton):
@@ -64,7 +64,6 @@ class StockList(QListWidget):
         else:
             self.show()
 
-    def action(self, item):
+    def action(self):
         self.clearSelection()
-        config.stk.insertWidget(1, InquiryCard(item.text()))
-        config.stk.setCurrentIndex(1)
+        nav.go_inquiry(self.currentItem().text(), 1)

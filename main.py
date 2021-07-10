@@ -55,7 +55,24 @@ class MainTab(QTabWidget):
 
     def create_explore_tab(self):
         self.explore_form.addWidget(QLabel("Explore By Ticker:"))
-        self.explore_form.addWidget(ExploreBar())
+        self.explore_form.addWidget(ExploreBar(0))
+        self.explore_form.addWidget(QLabel("\n\n\n"))
+
+        explore_apparatus = ExploreApparatus()
+
+
+        self.explore_form.addWidget(QLabel("Filter Sector:"))
+        self.explore_form.addWidget(explore_apparatus.sector_combo)
+        self.explore_form.addWidget(QLabel("Filter Country:"))
+        self.explore_form.addWidget(explore_apparatus.country_combo)
+        self.explore_form.addWidget(QLabel("Filter Min Market Cap:"))
+        explore_apparatus.cap_buttons.setParent(self.explore_form)
+        self.explore_form.addWidget(explore_apparatus.cap_buttons.button(0))
+        self.explore_form.addWidget(explore_apparatus.cap_buttons.button(1))
+        self.explore_form.addWidget(explore_apparatus.cap_buttons.button(2))
+        self.explore_form.addWidget(explore_apparatus.cap_buttons.button(3))
+
+        self.explore_form.addWidget(ExploreButton())
 
         self.explore_tab.setLayout(self.explore_form)
 
