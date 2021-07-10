@@ -21,11 +21,10 @@ class MainTab(QTabWidget):
     def __init__(self):
         super(MainTab, self).__init__()
         self.hub_tab, self.explore_tab, self.preferences_tab = QWidget(), QWidget(), QWidget()
-        self.hub_box, self.h_box, self.h2_box, self.h3_box = QVBoxLayout(), QHBoxLayout(), QHBoxLayout(), QHBoxLayout()
+        self.hub_box, self.explore_form, self.preferences_form = QVBoxLayout(), QFormLayout(), QFormLayout()
+        self.h_box, self.h2_box, self.h3_box, self.v_box = QHBoxLayout(), QHBoxLayout(), QHBoxLayout(), QVBoxLayout()
         self.create_hub_tab()
-        self.explore_form = QFormLayout()
         self.create_explore_tab()
-        self.preferences_form = QFormLayout()
         self.create_preferences_tab()
 
     def create_hub_tab(self):
@@ -47,6 +46,12 @@ class MainTab(QTabWidget):
         self.h3_box.addWidget(StockList(['IBM', 'AMZN', 'INTC', 'AMD', 'CRM', 'CSCO', 'ADBE', 'PLTR']))
         self.h3_box.addWidget(StockList(config.fav))
 
+        self.v_box.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
+        self.v_box.setSpacing(10)
+        self.v_box.addWidget(QLabel("Access Notes:"))
+        self.v_box.addWidget(NotesSelector())
+
+        self.h3_box.addLayout(self.v_box)
         self.hub_box.addLayout(self.h_box)
         self.hub_box.addLayout(self.h2_box)
         self.hub_box.addLayout(self.h3_box)
@@ -79,6 +84,8 @@ class MainTab(QTabWidget):
         self.addTab(self.explore_tab, "Explore")
 
     def create_preferences_tab(self):
+        self.preferences_form.addWidget(FullHelpButton())
+        self.preferences_form.addWidget(QLabel("\n\n\n"))
         self.preferences_form.addWidget(ResetButton())
 
         self.preferences_tab.setLayout(self.preferences_form)

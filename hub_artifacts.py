@@ -13,9 +13,14 @@ class ExitButton(QPushButton):
         self.clicked.connect(self.exit_action)
 
     def exit_action(self):
-        file = open("user_config.txt", "w")
+        file = open("user_config.txt", 'w')
         for favorite in config.fav:
-            file.write("{:s} ".format(favorite))
+            file.write("{:s};".format(favorite))
+        file.write("\n")
+        file.flush()
+        for key, value in config.notes.items():
+            file.writelines("{:s} {:s};\n".format(key, value))
+        file.flush()
         file.close()
         QCoreApplication.exit(0)
 
@@ -34,6 +39,8 @@ class RefreshButton(QPushButton):
             favs_label.hide()
         else:
             favs_label.show()
+        notes_selector = config.stk.widget(0).centralWidget().v_box.itemAt(1).widget()
+        notes_selector.update_noted_tickers()
 
 
 class StockListLabel(QLabel):
@@ -60,7 +67,13 @@ class StockList(QListWidget):
 
     def fill_favorites(self):
         file = open("user_config.txt", "r")
-        return file.read().split()
+        tickers = []
+        for ticker in file.readline().split(";"):
+            if ticker == '\n':
+                break
+            tickers.append(ticker)
+        file.close()
+        return tickers
 
     def fill_stock_list(self, stock_list):
         for item in stock_list:
@@ -80,3 +93,47 @@ class StockList(QListWidget):
     def action(self):
         self.clearSelection()
         nav.go_inquiry(self.currentItem().text(), 1)
+
+
+class NotesSelector(QComboBox):
+
+    def __init__(self):
+        super(NotesSelector, self).__init__()
+        self.setStyleSheet("background-color: rgba(0,0,0,0); width: 200px;"
+                           "border-style: solid; border-width: 1px; border-color: black;")
+        self.setMaximumWidth(100)
+        self.cache_users_notes()
+        self.update_noted_tickers()
+        self.notes_editor = None
+        self.ticker_select = None
+        self.currentIndexChanged.connect(self.open_notes_action)
+
+    def cache_users_notes(self):
+        file = open("user_config.txt", "r")
+
+        file.readline()
+
+        for ticker_notes in file.read().split(";\n"):
+            if ticker_notes == '\n':
+                break
+            entry = ticker_notes.split(' ', 1)
+            if len(entry) == 2:
+                config.notes[entry[0]] = entry[1]
+
+    def update_noted_tickers(self):
+        self.clear()
+        self.addItem("")
+        self.addItems(config.notes.keys())
+
+    def open_notes_action(self):
+        if self.currentText() == "":
+            return
+        self.ticker_select = self.currentText()
+        self.notes_editor = QTextEdit()
+        self.notes_editor.setStyleSheet('''QTextEdit{border-image: url(bg.jpg);}''')
+        self.notes_editor.closeEvent = self.save_notes_action
+        self.notes_editor.setText(config.notes[self.ticker_select])
+        self.notes_editor.show()
+
+    def save_notes_action(self, a0: QCloseEvent):
+        config.notes[self.ticker_select] = self.notes_editor.toPlainText()

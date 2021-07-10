@@ -1,1 +1,7 @@
-TSLA PLTR 
+TSLA;
+TSLA Good nice.  It should go up.;
+AMZN RSI(7): 51.01
+Not so favorable 7/5/2021
+Projected 5 point growth 3Q.
+;
+AMD Test;

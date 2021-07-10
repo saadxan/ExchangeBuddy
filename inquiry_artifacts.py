@@ -30,10 +30,43 @@ class HelpButton(QPushButton):
 
     def __init__(self):
         super(HelpButton, self).__init__("Help")
+        self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        self.help_dialog = QTextEdit()
+        self.help_dialog.setStyleSheet('''QTextEdit{border-image: url(bg.jpg);}''')
+        self.help_dialog.setMinimumWidth(700)
+        self.help_dialog.setReadOnly(True)
+        text = "Inquiry:\t-Use slide to manipulate chart to different periods (1w, 1m, ytd, 1y, a-t) real time.\n"
+        text += "\t-Use knob to change axis & line dimension to different parameters (open, volume, close) real time.\n"
+        text += "\t-Use button to toggle candle-lights representations for days (allowed for all periods except a-t).\n"
+        text += "\t-Hover over candle-light w/ mouse for expressions (the appropriate Date, Open, Close, High, Low).\n"
+        text += "\t-Calculations on stock (Low-High, Avg.Price, Avg.Volume, RSI, Dividends) will modify accordingly.\n"
+        text += "\t-Use mouse wheel (up/down) to zoom (in/out) respectively & right-click on graph to reset the zoom.\n"
+        text += "\t-Favorite/Unfavorite button can be clicked to add/remove the stock from user's favorite list.\n"
+        self.help_dialog.setText(text)
         self.clicked.connect(self.show_help_dialog)
 
     def show_help_dialog(self):
-        print("help")
+        self.help_dialog.show()
+
+
+class NotesButton(QPushButton):
+
+    def __init__(self, ticker):
+        super(NotesButton, self).__init__("Notes")
+        self.ticker = ticker
+        self.notes_editor = QTextEdit()
+        self.notes_editor.setStyleSheet('''QTextEdit{border-image: url(bg.jpg);}''')
+        self.notes_editor.closeEvent = self.save_notes_action
+        self.clicked.connect(self.open_notes_action)
+
+    def open_notes_action(self):
+        if self.ticker in config.notes.keys():
+            self.notes_editor.setText(config.notes[self.ticker])
+        self.notes_editor.show()
+
+    def save_notes_action(self, a0: QCloseEvent):
+        config.notes[self.ticker] = self.notes_editor.toPlainText()
+        nav.refresh_home()
 
 
 class FavoriteButton(QPushButton):
@@ -181,7 +214,6 @@ class StockChart(QChart):
         self.axisX().setLabelsFont(QFont("Verdana", 10))
         self.axisY().setLabelsFont(QFont("Verdana", 10))
 
-
     def update_chart(self, period, axis):
         self.period = period
         self.axis = axis
@@ -269,6 +301,7 @@ class InfoPiece(QTableWidget):
         self.verticalHeader().setStyleSheet("background-color: lightsteelblue;")
         self.setShowGrid(False)
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.ticker_symbol = ticker
         self.ticker = yf.Ticker(ticker)
         self.period = period
         self.info_table = []
@@ -298,9 +331,9 @@ class InfoPiece(QTableWidget):
                 avg_up.append(move)
             else:
                 avg_down.append(move)
-        avg_gain = sum(avg_up)/len(avg_up)
-        avg_loss = sum(avg_down)/len(avg_down)
-        rsi = 100 - (100/(1 + (avg_gain / abs(avg_loss))))
+        avg_gain = sum(avg_up) / len(avg_up)
+        avg_loss = sum(avg_down) / len(avg_down)
+        rsi = 100 - (100 / (1 + (avg_gain / abs(avg_loss))))
 
         self.info_table.append(("Previous Close:", "${:,.2f}".format(prev_close_price)))
         self.info_table.append(("Low - High:", "${:,.2f} - ${:,.2f}".format(low_price, high_price)))
@@ -318,8 +351,9 @@ class InfoPiece(QTableWidget):
         self.setRowCount(len(self.info_table))
         self.setColumnCount(1)
         self.setColumnWidth(0, 200)
-        self.setMaximumWidth(275)
+        self.setMaximumWidth(310)
         self.setMaximumHeight(240)
+        self.setHorizontalHeaderLabels(["{:s} Stats".format(self.ticker_symbol)])
 
         for i in range(self.rowCount()):
             title_value = self.info_table.pop(0)

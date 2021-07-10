@@ -30,6 +30,7 @@ class InquiryCard(QFrame):
         h_box.addWidget(inquiry_gui.TickerHeader(self.ticker))
         h_box.insertSpacing(2, 1000)
         h_box.addWidget(inquiry_gui.HelpButton())
+        h_box.addWidget(inquiry_gui.NotesButton(self.ticker))
         h_box.addWidget(inquiry_gui.FavoriteButton(self.ticker))
 
         v_box.addLayout(h_box)
@@ -39,7 +40,6 @@ class InquiryCard(QFrame):
         h2_box.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignLeft)
         h2_box.setSpacing(10)
         h2_box.addWidget(self.info)
-        #h2_box.addWidget(inquiry_gui.InfoPiece(self.ticker))
 
         v2_box = QVBoxLayout()
         v2_box.setSpacing(0)
