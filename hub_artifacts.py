@@ -13,6 +13,10 @@ class ExitButton(QPushButton):
         self.clicked.connect(self.exit_action)
 
     def exit_action(self):
+        file = open("user_config.txt", "w")
+        for favorite in config.fav:
+            file.write("{:s} ".format(favorite))
+        file.close()
         QCoreApplication.exit(0)
 
 
@@ -48,11 +52,18 @@ class StockList(QListWidget):
         self.setMaximumSize(175, 510)
         self.viewport().setAutoFillBackground(False)
         self.setStyleSheet("StockList{selection-background-color: khaki;}")
+        if stock_list == config.fav:
+            stock_list = self.fill_favorites()
+            config.fav = stock_list
         self.fill_stock_list(stock_list)
         self.itemClicked.connect(self.action)
 
-    def fill_stock_list(self, list):
-        for item in list:
+    def fill_favorites(self):
+        file = open("user_config.txt", "r")
+        return file.read().split()
+
+    def fill_stock_list(self, stock_list):
+        for item in stock_list:
             list_widget_item = QListWidgetItem("{text}".format(text=item))
             list_widget_item.setTextAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
             list_widget_item.setSizeHint(QSize(0, 75))

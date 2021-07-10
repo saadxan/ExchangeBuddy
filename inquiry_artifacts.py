@@ -26,6 +26,16 @@ class TickerHeader(QLabel):
         self.setFont(QFont("Verdana", 20, QFont.Bold))
 
 
+class HelpButton(QPushButton):
+
+    def __init__(self):
+        super(HelpButton, self).__init__("Help")
+        self.clicked.connect(self.show_help_dialog)
+
+    def show_help_dialog(self):
+        print("help")
+
+
 class FavoriteButton(QPushButton):
 
     def __init__(self, ticker):
@@ -54,7 +64,6 @@ class StockChartView(QChartView):
 
     def __init__(self, chart):
         super(StockChartView, self).__init__(chart)
-        self.setRubberBand(QChartView.HorizontalRubberBand)
 
     def validate_move(self):
         min_val = self.chart().axisX().min()
@@ -123,7 +132,10 @@ class StockChart(QChart):
         self.create_chart(period)
         self.legend().hide()
         self.setTheme(QChart.ChartThemeBlueCerulean)
+        self.setMinimumHeight(375)
         self.setTitle("{:s} chart of {:s}".format(period.upper(), ticker))
+        self.axisX().setLabelsFont(QFont("Verdana", 10))
+        self.axisY().setLabelsFont(QFont("Verdana", 10))
 
     def create_chart(self, period):
         stock_history = self.ticker.history(period=period)[self.axis]
@@ -166,6 +178,9 @@ class StockChart(QChart):
         if self.candle_status:
             self.toggle_candle_series(True)
 
+        self.axisX().setLabelsFont(QFont("Verdana", 10))
+        self.axisY().setLabelsFont(QFont("Verdana", 10))
+
 
     def update_chart(self, period, axis):
         self.period = period
@@ -200,7 +215,10 @@ class StockChart(QChart):
             x_bar_axis = QBarCategoryAxis()
             x_bar_axis.setCategories(dates)
             x_bar_axis.setGridLineVisible(False)
-            x_bar_axis.setLabelsAngle(-45)
+            if self.entry_amount < 30:
+                x_bar_axis.setLabelsAngle(-45)
+            else:
+                x_bar_axis.setLabelsAngle(-90)
 
             y_value_axis = QValueAxis(series)
             if self.axis != 'Volume':
@@ -214,6 +232,8 @@ class StockChart(QChart):
             self.removeAxis(self.axisY())
             self.removeAxis(self.axisX())
 
+            self.axisX().setLabelsFont(QFont("Verdana", 10))
+            self.axisY().setLabelsFont(QFont("Verdana", 10))
         else:
             self.candle_status = status
             self.update_chart(self.period, self.axis)
@@ -269,8 +289,18 @@ class InfoPiece(QTableWidget):
         avg_volume = stock_history['Volume'].mean()
         dividends = stock_history['Dividends'].sum()
         dollar_volume = stock_history.iloc[last - 1]['Volume'] * today_open_price
-        avg_move = stock_history['Close'].sum() - stock_history['Open'].sum()
-        rsi = 100 - (100 / (1 + avg_move))
+
+        avg_up = []
+        avg_down = []
+        for entry_close, entry_open in zip(list(stock_history['Close']), list(stock_history['Open'])):
+            move = entry_close - entry_open
+            if move >= 0:
+                avg_up.append(move)
+            else:
+                avg_down.append(move)
+        avg_gain = sum(avg_up)/len(avg_up)
+        avg_loss = sum(avg_down)/len(avg_down)
+        rsi = 100 - (100/(1 + (avg_gain / abs(avg_loss))))
 
         self.info_table.append(("Previous Close:", "${:,.2f}".format(prev_close_price)))
         self.info_table.append(("Low - High:", "${:,.2f} - ${:,.2f}".format(low_price, high_price)))
@@ -278,8 +308,8 @@ class InfoPiece(QTableWidget):
         self.info_table.append(("Average Price:", "${:,.2f}".format(avg_price)))
         self.info_table.append(("Dollar Volume:", "${:,.0f}".format(dollar_volume)))
         self.info_table.append(("Average Volume:", "{:,.0f}".format(avg_volume)))
+        self.info_table.append(("RSI({:d}):".format(last), "{:.2f}".format(rsi)))
         self.info_table.append(("Dividends:", "{:.2f}".format(dividends)))
-        self.info_table.append(("RSI:", "{:.2f}".format(rsi)))
 
         self.build_table()
 
@@ -289,6 +319,7 @@ class InfoPiece(QTableWidget):
         self.setColumnCount(1)
         self.setColumnWidth(0, 200)
         self.setMaximumWidth(275)
+        self.setMaximumHeight(240)
 
         for i in range(self.rowCount()):
             title_value = self.info_table.pop(0)
