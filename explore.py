@@ -5,10 +5,11 @@ from PyQt5.QtWidgets import *
 import explore_artifacts as explore_gui
 
 
-class ExploreQuery(QWidget):
+class ExploreQuery(QFrame):
 
     def __init__(self, sector='', country='', marketcap=0):
         super(ExploreQuery, self).__init__()
+        self.setStyleSheet('''ExploreQuery{border-image: url(bg.jpg);}''')
         self.build_query(sector, country, marketcap)
 
     def build_query(self, sector, country, marketcap):

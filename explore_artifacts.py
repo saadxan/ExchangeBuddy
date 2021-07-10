@@ -11,6 +11,7 @@ class ExploreBar(QLineEdit):
 
     def __init__(self, explore_type):
         super(ExploreBar, self).__init__()
+        self.setStyleSheet("background-color: rgba(0,0,0,0)")
         self.setPlaceholderText("Type & Press Enter")
         self.setCompleter(TickerCompleter(explore_type))
         self.textEdited.connect(self.to_uppercase)
@@ -75,6 +76,8 @@ class TypeComboBox(QComboBox):
 
     def __init__(self, type_combos=4):
         super(TypeComboBox, self).__init__()
+        self.setStyleSheet("background-color: rgba(0,0,0,0); width: 200px;"
+                           "border-style: solid; border-width: 1px; border-color: black;")
         self.addItems(set(EXPLORE_DATA_SET.advanced_info[type_combos]))
         self.setCurrentText('')
         self.selected_value = ''
@@ -139,6 +142,11 @@ class QueryResults(QTableWidget):
 
     def __init__(self, sector='', country='', marketcap=''):
         super(QueryResults, self).__init__()
+        self.setStyleSheet('''QueryResults{background-color: rgba(0,0,0,0);}
+                            QueryResults QTableCornerButton::section{background-color: rgba(0,0,0,0);}''')
+        self.setStyleSheet("QueryResults{selection-background-color: khaki;}")
+        self.horizontalHeader().setStyleSheet("background-color: rgba(0,0,0,0);")
+        self.verticalHeader().setStyleSheet("background-color: rgba(0,0,0,0);")
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.results = []

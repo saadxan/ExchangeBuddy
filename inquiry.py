@@ -2,13 +2,17 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+import random
 import inquiry_artifacts as inquiry_gui
 
 
-class InquiryCard(QWidget):
+class InquiryCard(QFrame):
 
     def __init__(self, ticker, period='7d'):
         super(InquiryCard, self).__init__()
+        image = "mesh" + str(random.randint(1, 5)) + ".jpg"
+        style = "InquiryCard{" + "border-image: url({:s});".format(image) + "}"
+        self.setStyleSheet(style)
         self.ticker = ticker
         self.period = period
         self.chart = inquiry_gui.StockChart(self.ticker)
@@ -33,6 +37,7 @@ class InquiryCard(QWidget):
         h2_box.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         h2_box.setSpacing(10)
         h2_box.addWidget(self.info)
+        #h2_box.addWidget(inquiry_gui.InfoPiece(self.ticker))
 
         v2_box = QVBoxLayout()
         v2_box.setSpacing(5)

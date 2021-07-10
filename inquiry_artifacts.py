@@ -1,6 +1,3 @@
-import math
-
-from PyQt5 import QtCore
 from PyQt5.QtChart import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -69,6 +66,7 @@ class StockChart(QChart):
         self.candle_status = False
         self.create_chart(period)
         self.legend().hide()
+        self.setTheme(QChart.ChartThemeBlueCerulean)
         self.setTitle("{:s} chart of {:s}".format(period.upper(), ticker))
 
     def create_chart(self, period):
@@ -130,14 +128,13 @@ class StockChart(QChart):
                 candle_set.setClose(entries['Close'][i])
                 candle_set.setTimestamp((entries.index[i].timestamp()))
                 series.append(candle_set)
-                date = QDateTime.fromMSecsSinceEpoch(((entries.index[i].timestamp() + 86400) * 1000)).toString(
-                    "MM/dd/yyyy")
+                date = QDateTime.fromSecsSinceEpoch((entries.index[i].timestamp() + 86400)).toString("MM/dd/yyyy")
                 dates.append(date)
-
-            self.addSeries(series)
 
             x_bar_axis = QBarCategoryAxis()
             x_bar_axis.setCategories(dates)
+            x_bar_axis.setGridLineVisible(False)
+            x_bar_axis.setLabelsAngle(-45)
 
             y_value_axis = QValueAxis(series)
             if self.axis != 'Volume':
@@ -145,6 +142,7 @@ class StockChart(QChart):
             else:
                 y_value_axis.setLabelFormat("%.0f")
 
+            self.addSeries(series)
             self.setAxisX(x_bar_axis, series)
             self.setAxisY(y_value_axis, series)
             self.removeAxis(self.axisY())
@@ -155,10 +153,15 @@ class StockChart(QChart):
 
     def mousePressEvent(self, event: 'QGraphicsSceneMouseEvent') -> None:
         button_clicked = event.button()
-        tick_count = self.axisX().tickCount()
+        tick_count = 0
+
+        if isinstance(self.axisX(), QDateTimeAxis):
+            tick_count = self.axisX().tickCount()
+        elif isinstance(self.axisX(), QBarCategoryAxis):
+            tick_count = self.axisX().count()
 
         if button_clicked == 1:
-            self.zoom(1.05)
+            self.zoom(1 + tick_count / 100.0)
         elif button_clicked == 2:
             self.zoomReset()
 
@@ -186,6 +189,12 @@ class InfoPiece(QTableWidget):
 
     def __init__(self, ticker, period='7d'):
         super(InfoPiece, self).__init__()
+        self.setSizeAdjustPolicy(QTableWidget.AdjustToContentsOnFirstShow)
+        self.setStyleSheet('''InfoPiece{background-color: lightsteelblue;}
+                            InfoPiece QTableCornerButton::section{background-color: lightsteelblue;}''')
+        self.horizontalHeader().setStyleSheet("background-color: lightsteelblue;")
+        self.verticalHeader().setStyleSheet("background-color: lightsteelblue;")
+        self.setShowGrid(False)
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ticker = yf.Ticker(ticker)
         self.period = period
@@ -211,7 +220,7 @@ class InfoPiece(QTableWidget):
         rsi = 100 - (100 / (1 + avg_move))
 
         self.info_table.append(("Previous Close:", "${:,.2f}".format(prev_close_price)))
-        self.info_table.append(("Low - High:", "${:.2f} - ${:,.2f}".format(low_price, high_price)))
+        self.info_table.append(("Low - High:", "${:,.2f} - ${:,.2f}".format(low_price, high_price)))
         self.info_table.append(("Open:", "${:,.2f}".format(today_open_price)))
         self.info_table.append(("Average Price:", "${:,.2f}".format(avg_price)))
         self.info_table.append(("Dollar Volume:", "${:,.0f}".format(dollar_volume)))
@@ -224,15 +233,14 @@ class InfoPiece(QTableWidget):
     def build_table(self):
         self.horizontalScrollBar().setDisabled(True)
         self.setRowCount(len(self.info_table))
-        self.setColumnCount(2)
-        self.setColumnWidth(0, 125)
-        self.setColumnWidth(1, 175)
-        self.setMaximumWidth(300)
+        self.setColumnCount(1)
+        self.setColumnWidth(0, 200)
+        self.setMaximumWidth(275)
 
         for i in range(self.rowCount()):
             title_value = self.info_table.pop(0)
-            self.setItem(i, 0, QTableWidgetItem(title_value[0]))
-            self.setItem(i, 1, QTableWidgetItem(title_value[1]))
+            self.setVerticalHeaderItem(i, QTableWidgetItem(title_value[0]))
+            self.setItem(i, 0, QTableWidgetItem(title_value[1]))
 
 
 class PeriodSlider(QSlider):

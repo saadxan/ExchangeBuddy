@@ -85,6 +85,7 @@ class MainTab(QTabWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     win = QMainWindow()
+    win.setStyleSheet('''QMainWindow{border-image: url(bg.jpg);}''')
     win.setCentralWidget(MainTab())
     config.stk = StackDriver()
     config.stk.insertWidget(0, win)

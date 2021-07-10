@@ -46,6 +46,8 @@ class StockList(QListWidget):
     def __init__(self, stock_list):
         super(StockList, self).__init__()
         self.setMaximumSize(175, 510)
+        self.viewport().setAutoFillBackground(False)
+        self.setStyleSheet("StockList{selection-background-color: khaki;}")
         self.fill_stock_list(stock_list)
         self.itemClicked.connect(self.action)
 
