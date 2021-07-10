@@ -1,12 +1,12 @@
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+import PyQt5.QtCore as QtCore
+import PyQt5.QtGui as QtGui
+import PyQt5.QtWidgets as QtWidgets
 
 import config
 import nav
 
 
-class ExitButton(QPushButton):
+class ExitButton(QtWidgets.QPushButton):
 
     def __init__(self):
         super(ExitButton, self).__init__("Exit")
@@ -22,10 +22,10 @@ class ExitButton(QPushButton):
             file.writelines("{:s} {:s};\n".format(key, value))
         file.flush()
         file.close()
-        QCoreApplication.exit(0)
+        QtCore.QCoreApplication.exit(0)
 
 
-class RefreshButton(QPushButton):
+class RefreshButton(QtWidgets.QPushButton):
 
     def __init__(self):
         super(RefreshButton, self).__init__("Refresh")
@@ -43,16 +43,16 @@ class RefreshButton(QPushButton):
         notes_selector.update_noted_tickers()
 
 
-class StockListLabel(QLabel):
+class StockListLabel(QtWidgets.QLabel):
 
     def __init__(self, text):
         super(StockListLabel, self).__init__(text)
-        self.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
+        self.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignTop)
         self.setMinimumWidth(175)
-        self.setFont(QFont("Verdana", 20))
+        self.setFont(QtGui.QFont("Verdana", 20))
 
 
-class StockList(QListWidget):
+class StockList(QtWidgets.QListWidget):
 
     def __init__(self, stock_list):
         super(StockList, self).__init__()
@@ -77,9 +77,10 @@ class StockList(QListWidget):
 
     def fill_stock_list(self, stock_list):
         for item in stock_list:
-            list_widget_item = QListWidgetItem("{text}".format(text=item))
-            list_widget_item.setTextAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
-            list_widget_item.setSizeHint(QSize(0, 75))
+            list_widget_item = QtWidgets.QListWidgetItem("{text}".format(text=item))
+            align = QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignVCenter
+            list_widget_item.setTextAlignment(align)
+            list_widget_item.setSizeHint(QtCore.QSize(0, 75))
             self.addItem(list_widget_item)
 
     def update_favs(self):
@@ -95,7 +96,7 @@ class StockList(QListWidget):
         nav.go_inquiry(self.currentItem().text(), 1)
 
 
-class NotesSelector(QComboBox):
+class NotesSelector(QtWidgets.QComboBox):
 
     def __init__(self):
         super(NotesSelector, self).__init__()
@@ -129,11 +130,11 @@ class NotesSelector(QComboBox):
         if self.currentText() == "":
             return
         self.ticker_select = self.currentText()
-        self.notes_editor = QTextEdit()
+        self.notes_editor = QtWidgets.QTextEdit()
         self.notes_editor.setStyleSheet('''QTextEdit{border-image: url(bg.jpg);}''')
         self.notes_editor.closeEvent = self.save_notes_action
         self.notes_editor.setText(config.notes[self.ticker_select])
         self.notes_editor.show()
 
-    def save_notes_action(self, a0: QCloseEvent):
+    def save_notes_action(self, a0: QtGui.QCloseEvent):
         config.notes[self.ticker_select] = self.notes_editor.toPlainText()

@@ -1,18 +1,16 @@
 import config
-import csv
 import nav
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+import PyQt5.QtCore as QtCore
+import PyQt5.QtWidgets as QtWidgets
 
 
-class FullHelpButton(QPushButton):
+class FullHelpButton(QtWidgets.QPushButton):
 
     def __init__(self):
         super(FullHelpButton, self).__init__("Help")
-        self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
-        self.help_dialog = QTextEdit()
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+        self.help_dialog = QtWidgets.QTextEdit()
         self.help_dialog.setStyleSheet('''QTextEdit{border-image: url(bg.jpg);}''')
         self.help_dialog.setMinimumWidth(700)
         self.help_dialog.setReadOnly(True)
@@ -37,25 +35,19 @@ class FullHelpButton(QPushButton):
         self.help_dialog.show()
 
 
-class ResetButton(QPushButton):
+class ResetButton(QtWidgets.QPushButton):
 
     def __init__(self):
         super(ResetButton, self).__init__("Reset")
-        self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
         self.clicked.connect(self.reset_action)
 
     def reset_action(self):
-        yes_or_no = QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        yes_or_no = QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         details = "This will erase everything to default.\nRemoving favorite tickers and wiping notes."
-        pick = QMessageBox.question(self, "Confirm", "Reset to default preferences?\n" + details, yes_or_no)
-        if pick == QMessageBox.StandardButton.Yes:
+        pick = QtWidgets.QMessageBox.question(self, "Confirm", "Reset to default preferences?\n" + details, yes_or_no)
+        if pick == QtWidgets.QMessageBox.StandardButton.Yes:
             config.fav = ['TSLA']
             config.notes = {'TSLA': 'Good nice.  It should go up.'}
             config.notes['AMZN'] = 'RSI(7): 51.01\nNot so favorable 7/5/2021\nProjected 5 point growth 3Q.\n'
             nav.refresh_home()
-
-
-
-
-
-

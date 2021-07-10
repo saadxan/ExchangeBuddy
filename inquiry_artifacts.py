@@ -1,15 +1,14 @@
-from PyQt5 import QtGui
 from PyQt5.QtChart import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+import PyQt5.QtCore as QtCore
+import PyQt5.QtGui as QtGui
+import PyQt5.QtWidgets as QtWidgets
 
 import config
 import nav
 import yfinance as yf
 
 
-class ReturnButton(QPushButton):
+class ReturnButton(QtWidgets.QPushButton):
 
     def __init__(self):
         super(ReturnButton, self).__init__("Return")
@@ -19,19 +18,19 @@ class ReturnButton(QPushButton):
         nav.return_home()
 
 
-class TickerHeader(QLabel):
+class TickerHeader(QtWidgets.QLabel):
 
     def __init__(self, ticker):
         super(TickerHeader, self).__init__(ticker)
-        self.setFont(QFont("Verdana", 20, QFont.Bold))
+        self.setFont(QtGui.QFont("Verdana", 20, QtGui.QFont.Bold))
 
 
-class HelpButton(QPushButton):
+class HelpButton(QtWidgets.QPushButton):
 
     def __init__(self):
         super(HelpButton, self).__init__("Help")
-        self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
-        self.help_dialog = QTextEdit()
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+        self.help_dialog = QtWidgets.QTextEdit()
         self.help_dialog.setStyleSheet('''QTextEdit{border-image: url(bg.jpg);}''')
         self.help_dialog.setMinimumWidth(700)
         self.help_dialog.setReadOnly(True)
@@ -49,12 +48,12 @@ class HelpButton(QPushButton):
         self.help_dialog.show()
 
 
-class NotesButton(QPushButton):
+class NotesButton(QtWidgets.QPushButton):
 
     def __init__(self, ticker):
         super(NotesButton, self).__init__("Notes")
         self.ticker = ticker
-        self.notes_editor = QTextEdit()
+        self.notes_editor = QtWidgets.QTextEdit()
         self.notes_editor.setStyleSheet('''QTextEdit{border-image: url(bg.jpg);}''')
         self.notes_editor.closeEvent = self.save_notes_action
         self.clicked.connect(self.open_notes_action)
@@ -64,12 +63,14 @@ class NotesButton(QPushButton):
             self.notes_editor.setText(config.notes[self.ticker])
         self.notes_editor.show()
 
-    def save_notes_action(self, a0: QCloseEvent):
-        config.notes[self.ticker] = self.notes_editor.toPlainText()
+    def save_notes_action(self, a0: QtGui.QCloseEvent):
+        notes = self.notes_editor.toPlainText()
+        if notes != "":
+            config.notes[self.ticker] = notes
         nav.refresh_home()
 
 
-class FavoriteButton(QPushButton):
+class FavoriteButton(QtWidgets.QPushButton):
 
     def __init__(self, ticker):
         super(FavoriteButton, self).__init__()
@@ -101,27 +102,16 @@ class StockChartView(QChartView):
     def validate_move(self):
         min_val = self.chart().axisX().min()
         true_min = self.chart().initial_range[0]
-        if type(min_val) is str:
-            true_min = QDateTime.toString(true_min, "MM/dd/yyyy")
-            if QDateTime.fromString(min_val, "MM/dd/yyyy") < QDateTime.fromString(true_min, "MM/dd/yyyy"):
-                self.chart().axisX().setMin(true_min)
-                return False
-        else:
-            if min_val < true_min:
-                self.chart().axisX().setMin(true_min)
-                return False
+        if min_val < true_min:
+            self.chart().axisX().setMin(true_min)
+            return False
 
         max_val = self.chart().axisX().max()
         true_max = self.chart().initial_range[1]
-        if type(max_val) is str:
-            true_max = QDateTime.toString(true_max, "MM/dd/yyyy")
-            if QDateTime.fromString(max_val, "MM/dd/yyyy") > QDateTime.fromString(true_max, "MM/dd/yyyy"):
-                self.chart().axisX().setMax(true_max)
-                return False
-        else:
-            if max_val > true_max:
-                self.chart().axisX().setMax(true_max)
-                return False
+
+        if max_val > true_max:
+            self.chart().axisX().setMax(true_max)
+            return False
 
         return True
 
@@ -167,8 +157,8 @@ class StockChart(QChart):
         self.setTheme(QChart.ChartThemeBlueCerulean)
         self.setMinimumHeight(375)
         self.setTitle("{:s} chart of {:s}".format(period.upper(), ticker))
-        self.axisX().setLabelsFont(QFont("Verdana", 10))
-        self.axisY().setLabelsFont(QFont("Verdana", 10))
+        self.axisX().setLabelsFont(QtGui.QFont("Verdana", 10))
+        self.axisY().setLabelsFont(QtGui.QFont("Verdana", 10))
 
     def create_chart(self, period):
         stock_history = self.ticker.history(period=period)[self.axis]
@@ -211,8 +201,8 @@ class StockChart(QChart):
         if self.candle_status:
             self.toggle_candle_series(True)
 
-        self.axisX().setLabelsFont(QFont("Verdana", 10))
-        self.axisY().setLabelsFont(QFont("Verdana", 10))
+        self.axisX().setLabelsFont(QtGui.QFont("Verdana", 10))
+        self.axisY().setLabelsFont(QtGui.QFont("Verdana", 10))
 
     def update_chart(self, period, axis):
         self.period = period
@@ -239,8 +229,9 @@ class StockChart(QChart):
                 candle_set.setClose(entries['Close'][i])
                 candle_set.setTimestamp((entries.index[i].timestamp()))
                 series.append(candle_set)
-                date = QDateTime.fromSecsSinceEpoch((entries.index[i].timestamp() + 86400)).toString("MM/dd/yyyy")
-                dates.append(date)
+                off = 86400
+                date = QtCore.QDateTime.fromSecsSinceEpoch((entries.index[i].timestamp() + off)).toString("MM/dd/yyyy")
+                dates.append(CandleDayString(date))
 
             self.entry_amount = len(dates)
 
@@ -263,26 +254,51 @@ class StockChart(QChart):
             self.setAxisY(y_value_axis, series)
             self.removeAxis(self.axisY())
             self.removeAxis(self.axisX())
+            self.initial_range = (self.axisX().min(), self.axisX().max())
 
-            self.axisX().setLabelsFont(QFont("Verdana", 10))
-            self.axisY().setLabelsFont(QFont("Verdana", 10))
+            self.axisX().setLabelsFont(QtGui.QFont("Verdana", 10))
+            self.axisY().setLabelsFont(QtGui.QFont("Verdana", 10))
         else:
             self.candle_status = status
             self.update_chart(self.period, self.axis)
+
+
+class CandleDayString(str):
+
+    def __new__(cls, *args, **kwargs):
+        return str.__new__(cls, *args, **kwargs)
+
+    def __eq__(self, x: str) -> bool:
+        return QtCore.QDateTime.fromString(self, "MM/dd/yyyy") == QtCore.QDateTime.fromString(str(x), "MM/dd/yyyy")
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __lt__(self, x: str) -> bool:
+        return QtCore.QDateTime.fromString(self, "MM/dd/yyyy") < QtCore.QDateTime.fromString(str(x), "MM/dd/yyyy")
+
+    def __gt__(self, x: str) -> bool:
+        return not self.__lt__(x)
+
+    def __le__(self, other):
+        return self.__lt__(other) or self.__eq__(other)
+
+    def __ge__(self, other):
+        return self.__gt__(other) or self.__eq__(other)
 
 
 class CandleStickDay(QCandlestickSeries):
 
     def __init__(self):
         super(CandleStickDay, self).__init__()
-        self.setIncreasingColor(QColor(0, 200, 0))
-        self.setDecreasingColor(QColor(200, 0, 0))
+        self.setIncreasingColor(QtGui.QColor(0, 200, 0))
+        self.setDecreasingColor(QtGui.QColor(200, 0, 0))
         self.parent_chart = get_this('chart')
         self.hovered.connect(self.action)
 
     def action(self, hovered, cs):
         if hovered is True:
-            date = QDateTime.fromMSecsSinceEpoch((cs.timestamp() + 86400) * 1000).toString("MM/dd/yyyy")
+            date = QtCore.QDateTime.fromMSecsSinceEpoch((cs.timestamp() + 86400) * 1000).toString("MM/dd/yyyy")
             tool = "{:s}:\nOpen:${:.2f}\nClose:${:.2f}".format(date, cs.open(), cs.close())
             tool += "\nLow:${:.2f}\nHigh:${:.2f}".format(cs.low(), cs.high())
             self.parent_chart.setToolTip(tool)
@@ -290,17 +306,17 @@ class CandleStickDay(QCandlestickSeries):
             self.parent_chart.setToolTip("")
 
 
-class InfoPiece(QTableWidget):
+class InfoPiece(QtWidgets.QTableWidget):
 
     def __init__(self, ticker, period='7d'):
         super(InfoPiece, self).__init__()
-        self.setSizeAdjustPolicy(QTableWidget.AdjustToContentsOnFirstShow)
+        self.setSizeAdjustPolicy(QtWidgets.QTableWidget.AdjustToContentsOnFirstShow)
         self.setStyleSheet('''InfoPiece{background-color: lightsteelblue;}
                             InfoPiece QTableCornerButton::section{background-color: lightsteelblue;}''')
         self.horizontalHeader().setStyleSheet("background-color: lightsteelblue;")
         self.verticalHeader().setStyleSheet("background-color: lightsteelblue;")
         self.setShowGrid(False)
-        self.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.ticker_symbol = ticker
         self.ticker = yf.Ticker(ticker)
         self.period = period
@@ -357,14 +373,14 @@ class InfoPiece(QTableWidget):
 
         for i in range(self.rowCount()):
             title_value = self.info_table.pop(0)
-            self.setVerticalHeaderItem(i, QTableWidgetItem(title_value[0]))
-            self.setItem(i, 0, QTableWidgetItem(title_value[1]))
+            self.setVerticalHeaderItem(i, QtWidgets.QTableWidgetItem(title_value[0]))
+            self.setItem(i, 0, QtWidgets.QTableWidgetItem(title_value[1]))
 
 
-class PeriodSlider(QSlider):
+class PeriodSlider(QtWidgets.QSlider):
 
     def __init__(self):
-        super(PeriodSlider, self).__init__(Qt.Orientation.Horizontal)
+        super(PeriodSlider, self).__init__(QtCore.Qt.Orientation.Horizontal)
         self.setFixedSize(230, 30)
         self.setRange(0, 4)
         self.setTickInterval(1)
@@ -392,11 +408,11 @@ class PeriodSlider(QSlider):
         info_piece.update_info(period)
 
 
-class AxisDial(QDial):
+class AxisDial(QtWidgets.QDial):
 
     def __init__(self):
         super(AxisDial, self).__init__()
-        self.setFixedSize(QSize(250, 75))
+        self.setFixedSize(QtCore.QSize(250, 75))
         self.setRange(0, 2)
         self.setNotchesVisible(True)
         self.valueChanged.connect(self.change_axis)
@@ -416,11 +432,11 @@ class AxisDial(QDial):
         stock_chart.update_chart(stock_chart.period, axis)
 
 
-class CandlestickToggle(QPushButton):
+class CandlestickToggle(QtWidgets.QPushButton):
 
     def __init__(self):
         super(CandlestickToggle, self).__init__("Show Candlesticks")
-        self.setFixedSize(QSize(250, 50))
+        self.setFixedSize(QtCore.QSize(250, 50))
         self.setCheckable(True)
         self.setChecked(False)
         self.clicked.connect(self.toggle_candles)

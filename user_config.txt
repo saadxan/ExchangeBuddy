@@ -5,3 +5,4 @@ Not so favorable 7/5/2021
 Projected 5 point growth 3Q.
 ;
 AMD Test;
+INTC ;

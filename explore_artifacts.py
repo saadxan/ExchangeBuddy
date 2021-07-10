@@ -2,12 +2,11 @@ import config
 import csv
 import nav
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+import PyQt5.QtCore as QtCore
+import PyQt5.QtWidgets as QtWidgets
 
 
-class ExploreBar(QLineEdit):
+class ExploreBar(QtWidgets.QLineEdit):
 
     def __init__(self, explore_type):
         super(ExploreBar, self).__init__()
@@ -35,7 +34,7 @@ class ExploreDataSet():
         self.advanced_info = self.basic_info + (self.cols['Country'], self.cols['Sector'], self.cols['Industry'])
 
     def make_data_set(self):
-        with open('tickers_dataset.csv', 'rU') as f:
+        with open('tickers_cache.csv', 'rU') as f:
             dict_reader = csv.DictReader(f)
             self.data = list(dict_reader)
             f.seek(0)
@@ -49,16 +48,16 @@ class ExploreDataSet():
                         self.cols[column_head] = [column_info]
 
 
-class TickerCompleter(QCompleter):
+class TickerCompleter(QtWidgets.QCompleter):
 
     def __init__(self, model_type=0):
         super(TickerCompleter, self).__init__()
-        self.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        self.setCaseSensitivity(QtCore.Qt.CaseSensitivity.CaseInsensitive)
         self.set_model_type(model_type)
         self.highlighted.connect(self.test)
 
     def set_model_type(self, model_type):
-        self.setModel(QStringListModel(EXPLORE_DATA_SET.advanced_info[model_type]))
+        self.setModel(QtCore.QStringListModel(EXPLORE_DATA_SET.advanced_info[model_type]))
 
     def test(self):
         print("testing")
@@ -72,7 +71,7 @@ class ExploreApparatus():
         self.cap_buttons = CapFilterButtons()
 
 
-class TypeComboBox(QComboBox):
+class TypeComboBox(QtWidgets.QComboBox):
 
     def __init__(self, type_combos=4):
         super(TypeComboBox, self).__init__()
@@ -87,15 +86,15 @@ class TypeComboBox(QComboBox):
         self.selected_value = self.currentText()
 
 
-class CapFilterButtons(QButtonGroup):
+class CapFilterButtons(QtWidgets.QButtonGroup):
 
     def __init__(self):
         super(CapFilterButtons, self).__init__()
         self.cap_filter = 0
-        self.b_none = QRadioButton("None")
-        self.b_1B = QRadioButton("1B")
-        self.b_10B = QRadioButton("10B")
-        self.b_100B = QRadioButton("100B")
+        self.b_none = QtWidgets.QRadioButton("None")
+        self.b_1B = QtWidgets.QRadioButton("1B")
+        self.b_10B = QtWidgets.QRadioButton("10B")
+        self.b_100B = QtWidgets.QRadioButton("100B")
         self.addButton(self.b_none, 0)
         self.addButton(self.b_1B, 1)
         self.addButton(self.b_10B, 2)
@@ -115,7 +114,7 @@ class CapFilterButtons(QButtonGroup):
             self.cap_filter = 100000000000
 
 
-class ExploreButton(QPushButton):
+class ExploreButton(QtWidgets.QPushButton):
 
     def __init__(self):
         super(ExploreButton, self).__init__("Explore")
@@ -128,7 +127,7 @@ class ExploreButton(QPushButton):
         nav.go_explore(sector_value, country_value, marketcap_value)
 
 
-class BackButton(QPushButton):
+class BackButton(QtWidgets.QPushButton):
 
     def __init__(self):
         super(BackButton, self).__init__("Back")
@@ -138,7 +137,7 @@ class BackButton(QPushButton):
         nav.return_home()
 
 
-class QueryResults(QTableWidget):
+class QueryResults(QtWidgets.QTableWidget):
 
     def __init__(self, sector='', country='', marketcap=''):
         super(QueryResults, self).__init__()
@@ -146,8 +145,8 @@ class QueryResults(QTableWidget):
                             QueryResults QTableCornerButton::section{background-color: rgba(0,0,0,0);}''')
         self.horizontalHeader().setStyleSheet("background-color: rgba(0,0,0,0);")
         self.verticalHeader().setStyleSheet("background-color: rgba(0,0,0,0);")
-        self.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.results = []
         self.query(sector, country, marketcap)
         self.validate_results()
@@ -161,7 +160,7 @@ class QueryResults(QTableWidget):
 
     def validate_results(self):
         if len(self.results) == 0:
-            empty_query_message = QErrorMessage()
+            empty_query_message = QtWidgets.QErrorMessage()
             empty_query_message.setFixedSize(475, 175)
             message = "No stocks found on NASDAQ w/ the selected parameters.<br><br>"
             message += "PS: Over 80% of NASDAQ tickers are American!"
@@ -177,14 +176,15 @@ class QueryResults(QTableWidget):
         self.setRowCount(len(self.results))
 
         for i, header in enumerate(self.results[0].keys()):
-            self.setHorizontalHeaderItem(i, QTableWidgetItem(header))
+            self.setHorizontalHeaderItem(i, QtWidgets.QTableWidgetItem(header))
 
         for i, result in enumerate(self.results):
             for j, result_val in enumerate(result):
                 if result_val != 'Market Cap':
-                    self.setItem(i, j, QTableWidgetItem(result[result_val]))
+                    self.setItem(i, j, QtWidgets.QTableWidgetItem(result[result_val]))
                 else:
-                    self.setItem(i, j, QTableWidgetItem("{:,.0f}M".format(float(result[result_val]) / 1000000)))
+                    mil = 1000000
+                    self.setItem(i, j, QtWidgets.QTableWidgetItem("{:,.0f}M".format(float(result[result_val]) / mil)))
 
         self.setColumnWidth(0, 75)
         self.setColumnWidth(1, 400)

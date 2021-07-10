@@ -1,13 +1,14 @@
-import config
+import PyQt5.QtWidgets as QtWidgets
 
-from inquiry import *
-from explore import *
+import config
+import inquiry
+import explore
 
 
 def go_inquiry(ticker, i):
-    bad_ticker_message = QErrorMessage()
+    bad_ticker_message = QtWidgets.QErrorMessage()
     try:
-        config.stk.insertWidget(i, InquiryCard(ticker))
+        config.stk.insertWidget(i, inquiry.InquiryCard(ticker))
     except IndexError:
         bad_ticker_message.showMessage("Ticker {:s} does not exist.".format(ticker))
     except ConnectionError:
@@ -19,7 +20,7 @@ def go_inquiry(ticker, i):
 
 
 def go_explore(sector, country, marketcap):
-    explore_query = ExploreQuery(sector, country, marketcap)
+    explore_query = explore.ExploreQuery(sector, country, marketcap)
     config.stk.insertWidget(1, explore_query)
     config.stk.setCurrentIndex(1)
     if len(config.stk.widget(1).layout().itemAt(1).widget().results) == 0:
