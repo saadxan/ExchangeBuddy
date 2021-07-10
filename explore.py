@@ -24,3 +24,4 @@ class ExploreQuery(QtWidgets.QFrame):
         v_box.addWidget(explore_gui.QueryResults(sector, country, marketcap))
 
         self.setLayout(v_box)
+

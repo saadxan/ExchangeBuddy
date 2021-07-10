@@ -347,9 +347,13 @@ class InfoPiece(QtWidgets.QTableWidget):
                 avg_up.append(move)
             else:
                 avg_down.append(move)
-        avg_gain = sum(avg_up) / len(avg_up)
-        avg_loss = sum(avg_down) / len(avg_down)
-        rsi = 100 - (100 / (1 + (avg_gain / abs(avg_loss))))
+
+        if len(avg_up) != 0 and len(avg_down) != 0:
+            avg_gain = sum(avg_up) / len(avg_up)
+            avg_loss = sum(avg_down) / len(avg_down)
+            rsi = 100 - (100 / (1 + (avg_gain / abs(avg_loss))))
+        else:
+            rsi = 0.00
 
         self.info_table.append(("Previous Close:", "${:,.2f}".format(prev_close_price)))
         self.info_table.append(("Low - High:", "${:,.2f} - ${:,.2f}".format(low_price, high_price)))

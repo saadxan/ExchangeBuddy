@@ -54,13 +54,10 @@ class TickerCompleter(QtWidgets.QCompleter):
         super(TickerCompleter, self).__init__()
         self.setCaseSensitivity(QtCore.Qt.CaseSensitivity.CaseInsensitive)
         self.set_model_type(model_type)
-        self.highlighted.connect(self.test)
 
     def set_model_type(self, model_type):
         self.setModel(QtCore.QStringListModel(EXPLORE_DATA_SET.advanced_info[model_type]))
 
-    def test(self):
-        print("testing")
 
 
 class ExploreApparatus():
