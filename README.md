@@ -37,6 +37,7 @@
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
+        <li><a href="#dependencies">Dependencies</a></li>
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
@@ -65,11 +66,11 @@ Features:
 ### Created With
 
 Here are the languages, tools, and frameworks used for the project.
-* [Python](https://www.sample.com/)
-* [PyQt5](https://www.sample.com/)
-* [yfinance](https://www.sample.com/)
-* [pandas](https://www.sample.com/)
-* [CSS](https://www.sample.com/)
+* [Python](https://www.python.org/)
+* [PyQt5](https://pypi.org/project/PyQt5/)
+* [yfinance](https://finance.yahoo.com/)
+* [pandas](https://pandas.pydata.org/)
+* [CSS](https://www.w3.org/CSS/)
 
 
 
@@ -78,16 +79,40 @@ Here are the languages, tools, and frameworks used for the project.
 
 Few instructions on how to set up the configurations for this project.
 
+### Dependencies
+
+Here are the specific depencies for the project.
+
+- python 3.9+
+- PyQt 5.14.4+
+- pandas 1.3.0+
+- yfinance 0.1.62+
+
 ### Installation
 
-1. Lorem ipsum dolor sit amet [https://www.sample.com/](https://www.sample.com/)
+1. The dependencies can installed w/ the Homebrew and pip package managers.
+   ```
+   brew install python3
+   ```
+   ```
+   brew install pip
+   ```
+   ```
+   pip install PyQt5
+   ```
+   ```
+   pip install pandas
+   ```
+   ```
+   pip install yfinance
+   ```
 2. Clone the repo
    ```
    git clone https://github.com/saadxan/ExchangeBuddy.git
    ```
 3. Run
    ```
-   python3.9 *.py
+   python3.9 main.py
    ```
 
 
