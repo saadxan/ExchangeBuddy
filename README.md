@@ -6,7 +6,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/saadxan/ExchangeBuddy/">
-    <img src="logo.png" alt="Logo" width="200" height="200">
+    <img src="images/logo.png" alt="Logo" width="200" height="200">
   </a>
   <p align="center">
     An interactive smart stock-analyzing application.
@@ -52,7 +52,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-<img src="sample-demo.png" alt="sample-demo" width="640" height="360">
+<img src="images/sample-demo.png" alt="sample-demo" width="640" height="360">
 
 An application that visualizes stock price movements and provides vital analytical data to lead to smart-minded investment decisions.
 
