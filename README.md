@@ -9,7 +9,7 @@
     <img src="logo.png" alt="Logo" width="200" height="200">
   </a>
   <p align="center">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    An interactive smart stock-analyzing application.
     <br />
     <a href="https://github.com/saadxan/ExchangeBuddy/README.md">
     <br />
@@ -52,13 +52,14 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-<img src="sample.png" alt="sample-demo" width="640" height="360">
+<img src="sample-demo.png" alt="sample-demo" width="640" height="360">
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam. 
+An application that visualizes stock price movements and provides vital analytical data to lead to smart-minded investment decisions.
 
 Features:
-* Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-* Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+* Provides the ability to inquiry any ticker on New York Stock Exchange and NASDAQ.
+* Interactive tools to manipulate historical chart by period (1 week, 1 month, 1 year, year-to-date, and all-time) or by data-points (open price, close price, volume)
+* 
 * Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 
@@ -90,7 +91,7 @@ Here are the specific depencies for the project.
 
 ### Installation
 
-1. The dependencies can installed w/ the Homebrew and pip package managers.
+1. The dependencies can installed w/ the Homebrew and pip package managers
    ```
    brew install python3
    ```
