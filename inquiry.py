@@ -10,7 +10,7 @@ class InquiryCard(QtWidgets.QFrame):
 
     def __init__(self, ticker, period='7d'):
         super(InquiryCard, self).__init__()
-        image = "mesh" + str(random.randint(1, 5)) + ".jpg"
+        image = "images/mesh" + str(random.randint(1, 5)) + ".jpg"
         style = "InquiryCard{" + "border-image: url({:s});".format(image) + "}"
         self.setStyleSheet(style)
         self.ticker = ticker

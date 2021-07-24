@@ -8,7 +8,7 @@ class ExploreQuery(QtWidgets.QFrame):
 
     def __init__(self, sector='', country='', marketcap=0):
         super(ExploreQuery, self).__init__()
-        self.setStyleSheet('''ExploreQuery{border-image: url(bg.jpg);}''')
+        self.setStyleSheet('''ExploreQuery{border-image: url(images/bg.jpg);}''')
         self.build_query(sector, country, marketcap)
 
     def build_query(self, sector, country, marketcap):

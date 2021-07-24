@@ -2,6 +2,7 @@ import config
 import sys
 
 import PyQt5.QtCore as QtCore
+import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
 
 import explore_artifacts as explore_gui
@@ -102,7 +103,8 @@ class MainTab(QtWidgets.QTabWidget):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     win = QtWidgets.QMainWindow()
-    win.setStyleSheet('''QMainWindow{border-image: url(bg.jpg);}''')
+    app.setWindowIcon(QtGui.QIcon("images/logo.png"))
+    win.setStyleSheet('''QMainWindow{border-image: url(images/bg.jpg);}''')
     win.setCentralWidget(MainTab())
     config.stk = StackDriver()
     config.stk.insertWidget(0, win)
