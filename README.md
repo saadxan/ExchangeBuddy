@@ -58,9 +58,10 @@ An application that visualizes stock price movements and provides vital analytic
 
 Features:
 * Provides the ability to inquiry any ticker on New York Stock Exchange and NASDAQ.
-* Interactive tools to manipulate historical chart by period (1 week, 1 month, 1 year, year-to-date, and all-time) or by data-points (open price, close price, volume)
-* 
-* Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+* Interactive tools to manipulate historical chart by period (1 week, 1 month, 1 year, year-to-date, and all-time) or by data-points (open price, close price, volume).
+* Tool to toggle candle-stick representation (showing the Open, Close, High, & Low prices) of trading days.
+* Presents list of market indices (^DJI, ^GSPC, ^IXIC, ^RUT) and configured watchlist/favorite-list of stocks. 
+* Explore tools to search for new tickers, based on specified paramters: Industry, Country, and/or Minimum Market Cap.
 
 
 
