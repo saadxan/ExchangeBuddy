@@ -14,7 +14,7 @@
     <a href="https://github.com/saadxan/ExchangeBuddy/README.md">
     <br />
     <br />
-    <a href="https://github.com/saadxan/ExchangeBuddy/README.md">View Demo</a>
+    <a href="/demo.md">View Demo</a>
     ·
     <a href="https://github.com/saadxan/ExchangeBuddy/issues">Report Bug</a>
     ·
@@ -136,7 +136,7 @@ Contributions are integral to the open source community and are the reasons why 
 <!-- LICENSE -->
 ## License
 
-Distributed under the !!! License. See `!!!` for more information.
+Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 
 
