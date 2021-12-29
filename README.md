@@ -97,10 +97,7 @@ Here are the specific depencies for the project.
    brew install python3
    ```
    ```
-   brew install pip
-   ```
-   ```
-   pip install PyQt5
+   pip install PyQt5 && pip install PyQtChart
    ```
    ```
    pip install pandas
